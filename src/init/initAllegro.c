@@ -40,10 +40,6 @@ int init() {
         return 0;
     }
 
-    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
-    al_append_path_component(path, "assets");
-    al_change_directory(al_path_cstr(path, '/'));
-    al_destroy_path(path);
 
     return 1;
 
@@ -90,11 +86,16 @@ int initEventQueue(ALLEGRO_EVENT_QUEUE **eventQueue, ALLEGRO_DISPLAY **display, 
 }
 
 int initFonts(ALLEGRO_FONT **font_size32) {
-    *font_size32 = al_load_font("fonts/arial.ttf", 32, 1);
+    ALLEGRO_PATH *path = al_get_standard_path(ALLEGRO_RESOURCES_PATH);
+    al_append_path_component(path, "assets");
+    al_change_directory(al_path_cstr(path, '/'));
+
+    *font_size32 = al_load_font("fonts/AtariSmall.ttf", 32, 1);
     if (*font_size32 == NULL) {
         fprintf(stderr, "font file does not exist or cannot be accessed!\n");
     }
 
+    al_destroy_path(path);
     return 1;
 }
 
