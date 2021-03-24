@@ -3,12 +3,12 @@
 //
 
 #include "../gameProps/gameProps.h"
-#include "../generalConfigsStructs/gameVariables.h"
+#include "../generalConfigs/gameVariables.h"
 
 #ifndef PDS_TP1_COMBATE_DRAW_H
 #define PDS_TP1_COMBATE_DRAW_H
 
 void drawPlayers(Players players, GameVariables variables);
-void drawScenario();
+void drawScenery();
 
 #endif //PDS_TP1_COMBATE_DRAW_H
