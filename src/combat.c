@@ -5,77 +5,143 @@
 #include <stdlib.h>
 #include <math.h>
 #include "init/initAllegro.h"
-#include "generalConfigsStructs/allegroControls.h"
-#include "generalConfigsStructs/gameVariables.h"
+#include "generalConfigs/allegroControls.h"
+#include "generalConfigs/gameVariables.h"
 #include "play/playGame.h"
+#include "gameProps/generatedProps.h"
+#include "utils/utils.h"
+#include "draw/colors.h"
 
 const float FPS = 100;
 const int SCREEN_W = 960;
 const int SCREEN_H = 540;
 
-Players initPlayers(GameVariables variables){
+Scenery initScenery(GameVariables variables) {
+    GeneratedObstacles generated = getPreDefinedObstacles(variables);
+
+    Scenery scenery;
+
+    scenery.obstacles.rectangularObstacles = generated.rectangularObstacles[generateRandomInt(0, 2)];
+
+    return scenery;
+}
+
+Players initPlayers(GameVariables variables) {
     float alpha = M_PI_2 - variables.THETA;
     float internTriangleHeight = variables.FORCEFIELDRADIUS * sin(alpha);
     float internTriangleHalfBase = variables.FORCEFIELDRADIUS * sin(variables.THETA);
+    Colors colors = getColors();
 
     Players players = {
             .tank1 = {
-                    .center = {
-                            .x = variables.SCREEN_W / 4,
-                            .y = variables.SCREEN_H / 2
+                    .mobileCircle = {
+                            .center = {
+                                    .x = 0.5 * (variables.SCREEN_HORIZONTAL_FRACTION),
+                                    .y = (variables.SCREEN_VERTICAL_FRACTION) * 2
+                            },
+                            .speed = 0.0,
+                            .angleAxisX = M_PI_2,
+                            .angularSpeed = 0.0,
+                            .radius = variables.FORCEFIELDRADIUS,
                     },
                     .A = {
                             .x = 0,
                             .y = -variables.FORCEFIELDRADIUS
                     },
                     .B = {
-                        .x = - internTriangleHalfBase,
-                        .y = internTriangleHeight
+                            .x = -internTriangleHalfBase,
+                            .y = internTriangleHeight
                     },
                     .C = {
                             .x = internTriangleHalfBase,
                             .y = internTriangleHeight
                     },
-                    .color = al_map_rgb(0, 0, 255),
-                    .speed = 0.0
+                    .color = colors.RED,
+                    .isColliding = 0,
+                    .healthPoints = 5,
+                    .points = 0
             },
             .tank2 = {
-                    .center = {
-                            .x = 3 * (variables.SCREEN_W / 4),
-                            .y = variables.SCREEN_H / 2
+                    .mobileCircle = {
+                            .center = {
+                                    .x = 5.5 * (variables.SCREEN_HORIZONTAL_FRACTION),
+                                    .y = (variables.SCREEN_VERTICAL_FRACTION) * 2
+                            },
+                            .speed = 0.0,
+                            .cosineAxisX = 0.0,
+                            .sineAxisY = 0.0,
+                            .angleAxisX = M_PI_2,
+                            .angularSpeed = 0.0,
+                            .radius = variables.FORCEFIELDRADIUS,
                     },
                     .A = {
                             .x = 0,
                             .y = -variables.FORCEFIELDRADIUS
                     },
                     .B = {
-                            .x = - internTriangleHalfBase,
+                            .x = -internTriangleHalfBase,
                             .y = internTriangleHeight
                     },
                     .C = {
                             .x = internTriangleHalfBase,
                             .y = internTriangleHeight
                     },
-                    .color = al_map_rgb(255, 0, 0),
-                    .speed = 0.0
+                    .color = colors.BLUE,
+                    .isColliding = 0,
+                    .healthPoints = 5,
+                    .points = 0
             },
     };
+
+    TankMissile firstMissile = {
+            .color = colors.GREEN,
+            .mobileCircle = {
+                    .center = players.tank1.A,
+                    .radius = 7.0,
+                    .angleAxisX = players.tank1.mobileCircle.angleAxisX
+            },
+            .isMoving = 0,
+
+    };
+
+    TankMissile secondMissile = {
+            .color = colors.PURPLE,
+            .mobileCircle = {
+                    .center = players.tank2.A,
+                    .radius = 7.0,
+                    .angleAxisX = players.tank2.mobileCircle.angleAxisX
+            },
+            .isMoving = 0,
+    };
+
+    players.tank1.mobileCircle.cosineAxisX = cos(players.tank1.mobileCircle.angleAxisX);
+    players.tank1.mobileCircle.sineAxisY = sin(players.tank1.mobileCircle.angleAxisX);
+    firstMissile.mobileCircle.cosineAxisX = players.tank1.mobileCircle.cosineAxisX;
+    firstMissile.mobileCircle.sineAxisY = players.tank1.mobileCircle.sineAxisY;
+    players.tank1.missile = firstMissile;
+    players.tank2.mobileCircle.cosineAxisX = cos(players.tank2.mobileCircle.angleAxisX);
+    players.tank2.mobileCircle.sineAxisY = sin(players.tank2.mobileCircle.angleAxisX);
+
+    secondMissile.mobileCircle.cosineAxisX = players.tank2.mobileCircle.cosineAxisX;
+    secondMissile.mobileCircle.sineAxisY = players.tank2.mobileCircle.sineAxisY;
+    players.tank2.missile = secondMissile;
 
     return players;
 }
 
-int main(int argc, char **argv){
+int main(int argc, char **argv) {
+    srand(time(NULL));
     ALLEGRO_DISPLAY *display = NULL;
     ALLEGRO_EVENT_QUEUE *eventQueue = NULL;
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_FONT *size_32;
 
-    if(!init() ||
-       !initTimer(&timer, FPS) ||
-       !initDisplay(&display, &timer, SCREEN_W, SCREEN_H) ||
-       !initEventQueue(&eventQueue, &display, &timer)||
-       !initFonts(&size_32)
-    ){
+    if (!init() ||
+        !initTimer(&timer, FPS) ||
+        !initDisplay(&display, &timer, SCREEN_W, SCREEN_H) ||
+        !initEventQueue(&eventQueue, &display, &timer) ||
+        !initFonts(&size_32)
+            ) {
         return -1;
     }
 
@@ -92,15 +158,20 @@ int main(int argc, char **argv){
             .FPS = FPS,
             .SCREEN_H = SCREEN_H,
             .SCREEN_W = SCREEN_W,
+            .SCREEN_HORIZONTAL_FRACTION = (SCREEN_W / 6),
+            .SCREEN_VERTICAL_FRACTION = (SCREEN_H / 4),
             .THETA = M_PI_4,
-            .FORCEFIELDRADIUS = 50.0,
+            .FORCEFIELDRADIUS = 30.0,
             .playing = 1,
-            .tankSpeed = 2.5
+            .tankSpeed = 2.5,
+            .angleVariation = M_PI_4 / 12
     };
 
     Players players = initPlayers(variables);
 
-    play(controls, &variables, &players);
+    Scenery scenery = initScenery(variables);
+
+    play(controls, &variables, &players, scenery);
 
     destroy(&eventQueue, &display, &timer);
 
