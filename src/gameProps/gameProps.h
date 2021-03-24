@@ -9,11 +9,34 @@ struct Point {
 
 typedef struct Point Point;
 
-struct Tank {
+struct MobileCircle {
     Point center;
+    float radius;
+    float speed;
+    float angleAxisX;
+    float cosineAxisX;
+    float sineAxisY;
+    float angularSpeed;
+};
+
+typedef struct MobileCircle MobileCircle;
+
+struct TankMissile {
+    MobileCircle mobileCircle;
+    ALLEGRO_COLOR color;
+    int isMoving;
+};
+
+typedef struct TankMissile TankMissile;
+
+struct Tank {
+    MobileCircle mobileCircle;
     Point A, B , C;
     ALLEGRO_COLOR color;
-    float speed;
+    float isColliding;
+    TankMissile missile;
+    int healthPoints;
+    int points;
 };
 
 typedef struct Tank Tank;
@@ -24,5 +47,30 @@ struct Players {
 };
 
 typedef struct Players Players;
+
+struct Rectangle{
+    Point A, B, C, D;
+    ALLEGRO_COLOR color;
+};
+
+typedef struct Rectangle RectangularObstacle;
+
+struct GeneratedObstacles {
+    RectangularObstacle rectangularObstacles[3];
+};
+
+typedef struct GeneratedObstacles GeneratedObstacles;
+
+struct Obstacles {
+    RectangularObstacle rectangularObstacles;
+};
+
+typedef struct Obstacles Obstacles;
+
+struct Scenery{
+    Obstacles obstacles;
+};
+
+typedef struct Scenery Scenery;
 
 #endif //PDS_TP1_COMBATE_GAMEPROPS_H
