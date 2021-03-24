@@ -116,10 +116,22 @@ void refreshTanks(Players *players, GameVariables variables, Scenery scenery) {
     refreshTank(&players->tank2, variables, scenery, &players->tank1);
 }
 
+void verifyGameOver(Players players, GameVariables* variables, AllegroControls controls) {
+    if(players.tank1.healthPoints <= 0 || players.tank2.healthPoints <= 0){
+        variables->playing = 0;
+        variables->history.firstPlayerWins += (players.tank1.healthPoints > 0);
+        variables->history.secondPlayerWins += (players.tank2.healthPoints > 0);
+        drawGameOver(players, *variables, controls);
+        al_flip_display();
+        al_rest(3);
+    }
+}
+
 void handleTimer(Players *players, ALLEGRO_EVENT event, AllegroControls controls,
-                 GameVariables variables, Scenery scenery) {
-    refreshTanks(players, variables, scenery);
-    draw(*players, variables, scenery);
+                 GameVariables* variables, Scenery scenery) {
+    refreshTanks(players, *variables, scenery);
+    draw(*players, *variables, scenery);
+    verifyGameOver(*players, variables, controls);
     al_flip_display();
 //    if (al_get_timer_count(controls.timer) % (int) variables.FPS == 0)
 //        printf("\n%d segundos se passaram...", (int) (al_get_timer_count(controls.timer) / variables.FPS));
@@ -228,6 +240,9 @@ void handleKeyDown(Players *players, ALLEGRO_EVENT event, AllegroControls contro
         case ALLEGRO_KEY_LEFT:
             handlePressRotateLeft(&players->tank2, variables.angleVariation);
             break;
+        case ALLEGRO_KEY_ENTER:
+            handlePressShoot(&players->tank2);
+            break;
     };
 }
 
@@ -235,7 +250,7 @@ void handleEvent(Players *players, ALLEGRO_EVENT event, AllegroControls controls
                  GameVariables *variables, Scenery scenery) {
     switch (event.type) {
         case ALLEGRO_EVENT_TIMER:
-            handleTimer(players, event, controls, *variables, scenery);
+            handleTimer(players, event, controls, variables, scenery);
             break;
         case ALLEGRO_EVENT_DISPLAY_CLOSE:
             variables->playing = 0;
