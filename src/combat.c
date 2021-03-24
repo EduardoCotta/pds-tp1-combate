@@ -15,6 +15,31 @@
 const float FPS = 100;
 const int SCREEN_W = 960;
 const int SCREEN_H = 540;
+char scoreFileName [20] = "scores.dat";
+
+GameHistory getGameHistory(){
+    GameHistory history = {
+            .firstPlayerWins = 0,
+            .secondPlayerWins = 0
+    };
+    FILE* file = openFile(scoreFileName, "r");
+
+    if(file){
+        history = readGameHistory(file);
+    }
+
+    closeFile(file);
+
+    return history;
+}
+
+void updateGameHistory(GameHistory history){
+    FILE* file = openFile(scoreFileName, "w+");
+
+    writeGameHistory(file, history);
+
+    closeFile(file);
+}
 
 Scenery initScenery(GameVariables variables) {
     GeneratedObstacles generated = getPreDefinedObstacles(variables);
@@ -154,6 +179,8 @@ int main(int argc, char **argv) {
             .timer = timer
     };
 
+    GameHistory history = getGameHistory();
+
     GameVariables variables = {
             .FPS = FPS,
             .SCREEN_H = SCREEN_H,
@@ -164,7 +191,8 @@ int main(int argc, char **argv) {
             .FORCEFIELDRADIUS = 30.0,
             .playing = 1,
             .tankSpeed = 2.5,
-            .angleVariation = M_PI_4 / 12
+            .angleVariation = M_PI_4 / 12,
+            .history = history
     };
 
     Players players = initPlayers(variables);
@@ -172,6 +200,8 @@ int main(int argc, char **argv) {
     Scenery scenery = initScenery(variables);
 
     play(controls, &variables, &players, scenery);
+
+    updateGameHistory(variables.history);
 
     destroy(&eventQueue, &display, &timer);
 
