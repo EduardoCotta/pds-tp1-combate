@@ -1,6 +1,11 @@
 #ifndef PDS_TP1_COMBATE_GAMEVARIABLES_H
 #define PDS_TP1_COMBATE_GAMEVARIABLES_H
 
+typedef struct GameHistory {
+    int firstPlayerWins;
+    int secondPlayerWins;
+} GameHistory;
+
 typedef struct GameVariables {
     float FPS;
     int SCREEN_W;
@@ -12,6 +17,7 @@ typedef struct GameVariables {
     int playing;
     float tankSpeed;
     float angleVariation;
+    GameHistory history;
 } GameVariables;
 
 
