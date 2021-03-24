@@ -4,6 +4,7 @@
 
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <stdio.h>
 #include "draw.h"
 
 void drawMissile(Tank tank, GameVariables variables){
@@ -46,3 +47,23 @@ void drawScenery(Scenery scenery){
 
     drawRectangularObstacle(scenery.obstacles.rectangularObstacles);
 };
+
+void drawGameOver(Players players, GameVariables variables, AllegroControls controls){
+    char score[20];
+    char playerOneWins[35];
+    char playerTwoWins[35];
+    al_clear_to_color(al_map_rgb(0, 0, 0));
+    sprintf(score, "Score: %d x %d", players.tank1.points, players.tank2.points);
+    sprintf(playerOneWins, "Player 1 won: %d times", variables.history.firstPlayerWins);
+    sprintf(playerTwoWins, "Player 2 won: %d times", variables.history.secondPlayerWins);
+
+    al_draw_text(controls.size_32, al_map_rgb(0, 200, 30),
+                 (2.25 * variables.SCREEN_W/6), variables.SCREEN_H/3, 0, score);
+
+    al_draw_text(controls.size_32, al_map_rgb(0, 200, 30),
+                 (2.1 * variables.SCREEN_W/6), 1.5 * variables.SCREEN_H/3, 0, playerOneWins);
+
+    al_draw_text(controls.size_32, al_map_rgb(0, 200, 30),
+                 (2.1 * variables.SCREEN_W/6), 2 * variables.SCREEN_H/3, 0, playerTwoWins);
+
+}
