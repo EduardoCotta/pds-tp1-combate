@@ -11,6 +11,7 @@
 #include "gameProps/generatedProps.h"
 #include "utils/utils.h"
 #include "draw/colors.h"
+#include "sound/sound.h"
 
 const float FPS = 100;
 const int SCREEN_W = 960;
@@ -42,11 +43,11 @@ void updateGameHistory(GameHistory history){
 }
 
 Scenery initScenery(GameVariables variables) {
-    GeneratedObstacles generated = getPreDefinedObstacles(variables);
+    PreDefinedGeneratedObstacles generated = getPreDefinedObstacles(variables);
 
     Scenery scenery;
 
-    scenery.obstacles.rectangularObstacles = generated.rectangularObstacles[generateRandomInt(0, 2)];
+    scenery.obstacles.generatedObstacles = generated.generatedObstacles[generateRandomInt(0, 4)];
 
     return scenery;
 }
@@ -84,7 +85,7 @@ Players initPlayers(GameVariables variables) {
                     .color = colors.RED,
                     .isColliding = 0,
                     .healthPoints = 5,
-                    .points = 0
+                    .points = 0,
             },
             .tank2 = {
                     .mobileCircle = {
@@ -114,7 +115,7 @@ Players initPlayers(GameVariables variables) {
                     .color = colors.BLUE,
                     .isColliding = 0,
                     .healthPoints = 5,
-                    .points = 0
+                    .points = 0,
             },
     };
 
@@ -180,6 +181,7 @@ int main(int argc, char **argv) {
     };
 
     GameHistory history = getGameHistory();
+    GameSoundSamples gameSoundSamples;
 
     GameVariables variables = {
             .FPS = FPS,
@@ -191,19 +193,27 @@ int main(int argc, char **argv) {
             .FORCEFIELDRADIUS = 30.0,
             .playing = 1,
             .tankSpeed = 2.5,
+            .missileSpeed = 4,
             .angleVariation = M_PI_4 / 12,
-            .history = history
+            .history = history,
+            .gameSoundSamples = gameSoundSamples
     };
+
+    loadSamples(&variables.gameSoundSamples);
 
     Players players = initPlayers(variables);
 
     Scenery scenery = initScenery(variables);
 
+    playSampleInstance(variables.gameSoundSamples.soundtrack_instance);
+
     play(controls, &variables, &players, scenery);
 
     updateGameHistory(variables.history);
 
-    destroy(&eventQueue, &display, &timer);
+    stopSampleInstance(variables.gameSoundSamples.soundtrack_instance);
+
+    destroy(&eventQueue, &display, &timer, &variables);
 
     return 0;
 }
