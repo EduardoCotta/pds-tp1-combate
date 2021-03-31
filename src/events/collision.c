@@ -83,11 +83,27 @@ int hasCollisionWithRectangularObstacle(RectangularObstacle rectangle, MobileCir
 }
 
 int hasObstacleDiagonalCollision(GameVariables variables, Scenery scenery, MobileCircle mobileCircle) {
-    return hasCollisionWithRectangularObstacleVertex(scenery.obstacles.rectangularObstacles, mobileCircle);
+    int isColliding = 0;
+    for (int i = 0; i < scenery.obstacles.generatedObstacles.numberOfObstacles; ++i) {
+        isColliding = hasCollisionWithRectangularObstacleVertex
+                (scenery.obstacles.generatedObstacles.rectangularObstacles[i], mobileCircle);
+        if(isColliding){
+            return isColliding;
+        }
+    }
+    return isColliding;
 }
 
 int hasObstacleCollision(GameVariables variables, Scenery scenery, MobileCircle mobileCircle) {
-    return hasCollisionWithRectangularObstacle(scenery.obstacles.rectangularObstacles, mobileCircle);
+    int isColliding = 0;
+    for (int i = 0; i < scenery.obstacles.generatedObstacles.numberOfObstacles; ++i) {
+        isColliding = hasCollisionWithRectangularObstacle
+        (scenery.obstacles.generatedObstacles.rectangularObstacles[i], mobileCircle);
+        if(isColliding){
+            return isColliding;
+        }
+    }
+    return isColliding;
 }
 
 int hasScreenCollision(GameVariables variables,  MobileCircle mobileCircle){
