@@ -10,6 +10,7 @@
 #define PDS_TP1_COMBATE_DRAW_H
 
 void drawPlayers(Players players, GameVariables variables);
+void drawScore(Players players, GameVariables variables, AllegroControls controls);
 void drawScenery();
 void drawGameOver(Players players, GameVariables variables, AllegroControls controls);
 

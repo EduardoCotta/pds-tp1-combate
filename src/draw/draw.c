@@ -45,8 +45,23 @@ void drawRectangularObstacle(RectangularObstacle obstacle) {
 void drawScenery(Scenery scenery){
     al_clear_to_color(al_map_rgb(255, 255, 255));
 
-    drawRectangularObstacle(scenery.obstacles.rectangularObstacles);
+    for (int i = 0; i < scenery.obstacles.generatedObstacles.numberOfObstacles; ++i) {
+        drawRectangularObstacle(scenery.obstacles.generatedObstacles.rectangularObstacles[i]);
+    }
 };
+
+void drawScore(Players players, GameVariables variables, AllegroControls controls){
+    char scorePlayerOne[20];
+    char scorePlayerTwo[20];
+
+    sprintf(scorePlayerOne, "Player 1: %d", players.tank1.points);
+    sprintf(scorePlayerTwo, "Player 2: %d", players.tank2.points);
+
+    al_draw_text(controls.size_32, players.tank1.color,
+                 (0.5 * variables.SCREEN_W/8), variables.SCREEN_H/10, 0, scorePlayerOne);
+    al_draw_text(controls.size_32, players.tank2.color,
+                 (4.5 * variables.SCREEN_W/6), variables.SCREEN_H/10, 0, scorePlayerTwo);
+}
 
 void drawGameOver(Players players, GameVariables variables, AllegroControls controls){
     char score[20];
