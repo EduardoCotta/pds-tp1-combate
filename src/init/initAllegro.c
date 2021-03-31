@@ -3,8 +3,13 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_ttf.h>
 #include "initAllegro.h"
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
-
+int initSound(){
+    al_install_audio();
+    al_init_acodec_addon();
+}
 
 int init() {
     //inicializa o Allegro
@@ -40,6 +45,7 @@ int init() {
         return 0;
     }
 
+    initSound();
 
     return 1;
 
@@ -103,7 +109,11 @@ int starTimer(ALLEGRO_TIMER **timer) {
     al_start_timer(*timer);
 }
 
-int destroy(ALLEGRO_EVENT_QUEUE **eventQueue, ALLEGRO_DISPLAY **display, ALLEGRO_TIMER **timer) {
+int destroy(ALLEGRO_EVENT_QUEUE **eventQueue, ALLEGRO_DISPLAY **display, ALLEGRO_TIMER **timer, GameVariables* variables) {
+    al_destroy_sample(variables->gameSoundSamples.explosion);
+    al_destroy_sample(variables->gameSoundSamples.shot);
+    al_destroy_sample(variables->gameSoundSamples.soundtrack);
+    al_destroy_sample_instance(variables->gameSoundSamples.soundtrack_instance);
     al_destroy_timer(*timer);
     al_destroy_display(*display);
     al_destroy_event_queue(*eventQueue);
