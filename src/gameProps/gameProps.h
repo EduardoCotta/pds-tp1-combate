@@ -57,12 +57,19 @@ typedef struct Rectangle RectangularObstacle;
 
 struct GeneratedObstacles {
     RectangularObstacle rectangularObstacles[3];
+    int numberOfObstacles;
 };
 
 typedef struct GeneratedObstacles GeneratedObstacles;
 
+struct PreDefinedGeneratedObstacles {
+    GeneratedObstacles generatedObstacles[10];
+};
+
+typedef struct PreDefinedGeneratedObstacles PreDefinedGeneratedObstacles;
+
 struct Obstacles {
-    RectangularObstacle rectangularObstacles;
+    GeneratedObstacles generatedObstacles;
 };
 
 typedef struct Obstacles Obstacles;
